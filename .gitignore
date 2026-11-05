@@ -1,0 +1,32 @@
+# Raw and processed datasets
+data/raw/
+data/processed/
+
+# Generated outputs
+checkpoints/
+results/
+
+# Python cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Jupyter temporary files
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment variables and credentials
+.env
+.env.*
+!.env.example
+
+# Operating system files
+.DS_Store
+
+# Logs
+*.log
