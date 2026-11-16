@@ -1,12 +1,12 @@
-# Raw and processed datasets
+# Datasets
 data/raw/
 data/processed/
 
-# Generated outputs
-checkpoints/
-results/
-
-# Python cache
+# Python environments and caches
+.venv/
+venv/
+env/
+.local_python/
 __pycache__/
 *.py[cod]
 .pytest_cache/
@@ -15,18 +15,42 @@ __pycache__/
 .ipynb_checkpoints/
 **/.ipynb_checkpoints/
 
-# Virtual environments
-.venv/
-venv/
-env/
-
-# Environment variables and credentials
+# Credentials
 .env
 .env.*
 !.env.example
 
-# Operating system files
+# System files and logs
 .DS_Store
-
-# Logs
 *.log
+
+# Checkpoints: include only the three required models
+checkpoints/*
+!checkpoints/ppg_cnn_best.pt
+!checkpoints/reliability_classifier_nonlinear_full.joblib
+!checkpoints/learned_policy_fitted_q_full.pt
+
+# Results: include selected evaluation summaries
+results/*
+!results/metrics/
+results/metrics/*
+!results/metrics/final_test/
+results/metrics/final_test/*
+
+!results/metrics/final_test/test_policy_comparison.csv
+!results/metrics/final_test/test_policy_per_subject.csv
+!results/metrics/final_test/investigation_budget_ablation.csv
+!results/metrics/final_test/investigation_action_ablation.csv
+!results/metrics/final_test/ppg_noise_robustness.csv
+!results/metrics/final_test/test_policy_error_audit.csv
+!results/metrics/final_test/reproducibility_manifest.json
+
+!results/metrics/ppg_cnn_training_history.csv
+!results/metrics/fitted_q_full_training.csv
+
+# Local backups
+*.backup
+app_backup_*.py
+app_before_*.py
+app_prototype.py
+/=

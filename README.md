@@ -1,4 +1,32 @@
 # MotionProof AI
+## Deliverable 2: Implementation and Early Evaluation
+
+**Status: Implemented (November 2026)**
+
+MotionProof AI includes a PPG heart-rate CNN, nonlinear reliability classifier, fixed-rule baseline, learned fitted Q-learning investigation policy, and interactive Streamlit prototype.
+
+### Run the prototype
+
+Install dependencies with `pip install -r requirements.txt`, then launch with `streamlit run app.py`.
+
+### Evaluation
+
+Held-out evaluation on 13,007 windows from PPG-DaLiA participants S13-S15. The learned policy achieved 88.14% recall, 40.61% F1, 64.24% accuracy, and 60.39% specificity. Higher recall comes with additional false positives.
+
+### Project files
+
+- `app.py`: interactive prototype
+- `checkpoints/`: trained models
+- `src/agents/`: investigation policies
+- `src/evaluation/`: evaluation code
+- `results/metrics/final_test/`: evaluation results
+- `notebooks/D2_Implementation_and_Early_Evaluation.ipynb`: executed D2 notebook
+- `docs/screenshots/`: interface screenshots
+
+Raw PPG-DaLiA data is not included. This is a research prototype, not a medical device.
+
+---
+
 
 ## Adaptive Agent Investigation for Reliable Heart Rate Estimation Using Multimodal Deep Learning
 

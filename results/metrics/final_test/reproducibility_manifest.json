@@ -1,0 +1,35 @@
+{
+  "project": "MotionProof AI",
+  "created_utc": "2026-11-10T00:13:02.172104+00:00",
+  "python_version": "3.10.12",
+  "pytorch_version": "2.9.1+cu128",
+  "numpy_version": "1.24.1",
+  "pandas_version": "2.1.4",
+  "sklearn_version": "1.4.0",
+  "cuda_available": true,
+  "torch_cuda_version": "12.8",
+  "test_subjects": [
+    13,
+    14,
+    15
+  ],
+  "test_windows": 13007,
+  "random_seed": 42,
+  "checkpoints": {
+    "cnn": {
+      "path": "checkpoints/ppg_cnn_best.pt",
+      "size_bytes": 2091449,
+      "sha256": "af193b6d5fe39259b47f94b79b2bce68ffa462b7b9f796ae014988fa4f41f593"
+    },
+    "reliability_classifier": {
+      "path": "checkpoints/reliability_classifier_nonlinear_full.joblib",
+      "size_bytes": 304360,
+      "sha256": "82f98d732a0960b66cefa3e5a092769001b5d9d3a240c8623b69cdfb5be00d50"
+    },
+    "fitted_q_policy": {
+      "path": "checkpoints/learned_policy_fitted_q_full.pt",
+      "size_bytes": 84937,
+      "sha256": "7058bb0d94f77d62e3b46d2c739e18033865938247362f9a4b09b9b95c663957"
+    }
+  }
+}
