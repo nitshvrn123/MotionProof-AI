@@ -1,0 +1,17 @@
+{
+  "selected_method": "platt",
+  "calibrators": {
+    "original": {
+      "method": "original"
+    },
+    "platt": {
+      "method": "platt",
+      "coef": 0.5576636531504259,
+      "intercept": -0.5247986110616262
+    },
+    "isotonic": {
+      "method": "isotonic",
+      "breakpoints": 62
+    }
+  }
+}

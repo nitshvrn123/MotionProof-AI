@@ -1,0 +1,39 @@
+{
+  "recall_floor_validation": 0.8069424964936885,
+  "selected_per_family": [
+    {
+      "family": "reward_retrained_policy",
+      "variant": "original_reward_retrain",
+      "recall": 0.811711079943899,
+      "false_positive_rate": 0.3458414843796313,
+      "f1": 0.6510383750721989
+    },
+    {
+      "family": "agent_calibrated_veto",
+      "variant": "tau=0.26",
+      "recall": 0.8127629733520336,
+      "false_positive_rate": 0.3667081629023653,
+      "f1": 0.6410398230088494
+    },
+    {
+      "family": "probability_threshold",
+      "variant": "tau=0.30",
+      "recall": 0.8141654978962132,
+      "false_positive_rate": 0.43962297705850967,
+      "f1": 0.6073764059639027
+    },
+    {
+      "family": "bayes_cost_rule",
+      "variant": "fp=-1.5",
+      "recall": 0.8548387096774194,
+      "false_positive_rate": 0.47981504534945757,
+      "f1": 0.6104156234351527
+    }
+  ],
+  "selected_overall": [
+    {
+      "family": "reward_retrained_policy",
+      "variant": "original_reward_retrain"
+    }
+  ]
+}

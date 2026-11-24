@@ -1,0 +1,79 @@
+{
+  "name": "phase2_fp_reduction",
+  "description": "Controlled false-positive reduction experiments around the frozen learned policy.",
+  "selection_split": "validation (S11, S12)",
+  "selection_rule": {
+    "objective": "minimize validation false_positive_rate",
+    "constraint": "validation recall >= original learned policy validation recall - recall_tolerance",
+    "recall_tolerance": 0.05,
+    "tie_breaker": "higher validation f1"
+  },
+  "reporting_reward": "original InvestigationRewardConfig (TP +2, FP -1.5, FN -2, TN 0, cost 0.1 per check)",
+  "calibrator": "checkpoints/experimental/calibration/platt_calibrator.joblib (selected in phase 1)",
+  "families": {
+    "probability_threshold": {
+      "description": "No investigation; flag if calibrated p >= tau",
+      "tau_grid": [
+        0.05,
+        0.95,
+        0.01
+      ]
+    },
+    "agent_calibrated_veto": {
+      "description": "Original agent runs unchanged; a FLAG is kept only if calibrated p >= tau",
+      "tau_grid": [
+        0.05,
+        0.95,
+        0.01
+      ]
+    },
+    "bayes_cost_rule": {
+      "description": "No investigation; flag if calibrated p exceeds the expected-reward break-even point for a cost setting (no tuning)",
+      "false_positive_penalties": [
+        -1.5,
+        -2.0,
+        -2.5,
+        -3.0
+      ]
+    },
+    "reward_retrained_policy": {
+      "description": "Fitted Q retrained on S1-S10 with the original procedure and an alternative reward",
+      "variants": {
+        "original_reward_retrain": {
+          "false_positive_penalty": -1.5,
+          "investigation_cost": 0.1
+        },
+        "fp2.0": {
+          "false_positive_penalty": -2.0,
+          "investigation_cost": 0.1
+        },
+        "fp2.5": {
+          "false_positive_penalty": -2.5,
+          "investigation_cost": 0.1
+        },
+        "fp3.0": {
+          "false_positive_penalty": -3.0,
+          "investigation_cost": 0.1
+        },
+        "cost0.05": {
+          "false_positive_penalty": -1.5,
+          "investigation_cost": 0.05
+        },
+        "cost0.2": {
+          "false_positive_penalty": -1.5,
+          "investigation_cost": 0.2
+        }
+      },
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "selection_uses": "mean of validation metrics across seeds"
+    }
+  },
+  "seed": 42,
+  "notes": [
+    "Retraining the original reward reproduces training losses closely but not bit-exactly (hardware nondeterminism); test decision agreement with the production checkpoint is 91.2%. Variants are therefore compared with 'original_reward_retrain' trained under identical conditions, using three seeds."
+  ]
+}

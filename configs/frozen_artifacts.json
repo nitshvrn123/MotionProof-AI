@@ -1,0 +1,20 @@
+{
+  "description": "SHA-256 of frozen D2 artifacts. These files must never change; verify with python -m src.experiments.verify_frozen.",
+  "files": {
+    "checkpoints/learned_policy_fitted_q_full.pt": "7058bb0d94f77d62e3b46d2c739e18033865938247362f9a4b09b9b95c663957",
+    "checkpoints/ppg_cnn_best.pt": "af193b6d5fe39259b47f94b79b2bce68ffa462b7b9f796ae014988fa4f41f593",
+    "checkpoints/reliability_classifier_nonlinear_full.joblib": "82f98d732a0960b66cefa3e5a092769001b5d9d3a240c8623b69cdfb5be00d50",
+    "results/metrics/final_test/investigation_action_ablation.csv": "ef04ca77ab502a52405bad6d0a76cefb11b3be1e8aa678fa5240abaca4fd9f8f",
+    "results/metrics/final_test/investigation_action_ablation_details.csv": "41c9f5509860fb02e3bd20436369dabbc750b404856ba9107974c60befa3d5f8",
+    "results/metrics/final_test/investigation_budget_ablation.csv": "d2bf1edb5c35214193f23629f66be9d4c620a2840c48a10d667afe9ce35cde54",
+    "results/metrics/final_test/investigation_budget_ablation_details.csv": "6dc454f04dd564e5cb7c90b277b8d1deb5a778eaf1637bc1f219d18ba4ef02da",
+    "results/metrics/final_test/ppg_noise_robustness.csv": "439de79d14e07fa9775c5197f116078490d572b6cd1943bd83aab7e483ddb414",
+    "results/metrics/final_test/ppg_noise_robustness_details.csv": "afdbe9489612ec91242c02acff282457207fdaee6b3859065c6877dd2bf22138",
+    "results/metrics/final_test/reproducibility_manifest.json": "80df2b88fea1ea69c92275a53d27b5bf08cbba67c1cfa167e682db971aeef1ff",
+    "results/metrics/final_test/test_policy_comparison.csv": "45440dc77ee6254c646d1a1063eb9d7f0512207aef6909212f714736cb99272d",
+    "results/metrics/final_test/test_policy_decisions.csv": "b83c7ca1845798307d2b019ecdcb26a1e345015cd689749303ecd49ee24c3aa1",
+    "results/metrics/final_test/test_policy_error_audit.csv": "fcef23c060655b01343a824f57e0682d9a5abd463b6c545fa13e3be34e7cf2dd",
+    "results/metrics/final_test/test_policy_inputs_nonlinear.csv": "4e2d7c158f1c4602697884a073218c10364cbad5a8ea14a1328e4e0e23c4f07e",
+    "results/metrics/final_test/test_policy_per_subject.csv": "f3fbac9cf86bed7a794ff9e0aea1a5f74cd4a72123a08a6b4ca7f1758ded3dba"
+  }
+}

@@ -1,0 +1,148 @@
+{
+  "created_utc": "2026-11-23T20:41:23+00:00",
+  "config": {
+    "name": "phase3_robustness",
+    "description": "Full-pipeline robustness of CNN, reliability classifier and policies on held-out test recordings.",
+    "subjects": [
+      13,
+      14,
+      15
+    ],
+    "seed": 42,
+    "seed_rule": "rng seed = seed + 1000 * condition_index + subject",
+    "synthetic_conditions": [
+      {
+        "perturbation": "clean",
+        "level": 0,
+        "group": "reference"
+      },
+      {
+        "perturbation": "gaussian_noise",
+        "level": 0.05,
+        "group": "PPG noise"
+      },
+      {
+        "perturbation": "gaussian_noise",
+        "level": 0.1,
+        "group": "PPG noise"
+      },
+      {
+        "perturbation": "gaussian_noise",
+        "level": 0.2,
+        "group": "PPG noise"
+      },
+      {
+        "perturbation": "gaussian_noise",
+        "level": 0.5,
+        "group": "PPG noise"
+      },
+      {
+        "perturbation": "accelerometer_coupled_artifact",
+        "level": 0.25,
+        "group": "Motion interference"
+      },
+      {
+        "perturbation": "accelerometer_coupled_artifact",
+        "level": 0.5,
+        "group": "Motion interference"
+      },
+      {
+        "perturbation": "accelerometer_coupled_artifact",
+        "level": 1.0,
+        "group": "Motion interference"
+      },
+      {
+        "perturbation": "periodic_motion_artifact",
+        "level": 0.25,
+        "group": "Motion interference"
+      },
+      {
+        "perturbation": "periodic_motion_artifact",
+        "level": 0.5,
+        "group": "Motion interference"
+      },
+      {
+        "perturbation": "periodic_motion_artifact",
+        "level": 1.0,
+        "group": "Motion interference"
+      },
+      {
+        "perturbation": "baseline_wander",
+        "level": 1.0,
+        "group": "Signal degradation"
+      },
+      {
+        "perturbation": "amplitude_attenuation",
+        "level": 0.5,
+        "group": "Signal degradation"
+      },
+      {
+        "perturbation": "amplitude_attenuation",
+        "level": 0.25,
+        "group": "Signal degradation"
+      },
+      {
+        "perturbation": "signal_dropout",
+        "level": 1.0,
+        "group": "Signal degradation"
+      },
+      {
+        "perturbation": "signal_dropout",
+        "level": 2.0,
+        "group": "Signal degradation"
+      },
+      {
+        "perturbation": "clipping",
+        "level": 0.1,
+        "group": "Signal degradation"
+      },
+      {
+        "perturbation": "clipping",
+        "level": 0.2,
+        "group": "Signal degradation"
+      }
+    ],
+    "units": {
+      "gaussian_noise": "noise std as a fraction of window PPG std",
+      "accelerometer_coupled_artifact": "artefact std as a fraction of window PPG std",
+      "periodic_motion_artifact": "2 Hz artefact std as a fraction of window PPG std",
+      "baseline_wander": "0.2 Hz drift amplitude as a fraction of window PPG std",
+      "amplitude_attenuation": "gain applied to the pulse waveform",
+      "signal_dropout": "seconds replaced by the window mean",
+      "clipping": "fraction clipped at each tail"
+    },
+    "natural_subgroups": {
+      "variable": "std of accelerometer magnitude per window (g)",
+      "bins": "quartiles over all test windows"
+    },
+    "activity_labels": "not available: processed test files contain only ppg, acc, hr, subject, split"
+  },
+  "inputs": {
+    "results/metrics/final_test/test_policy_inputs_nonlinear.csv": "4e2d7c158f1c4602697884a073218c10364cbad5a8ea14a1328e4e0e23c4f07e",
+    "results/metrics/final_test/test_policy_decisions.csv": "b83c7ca1845798307d2b019ecdcb26a1e345015cd689749303ecd49ee24c3aa1"
+  },
+  "outputs": [
+    "results/experiments/phase3_robustness/natural_motion_subgroups.csv",
+    "results/experiments/phase3_robustness/participant_level_frozen.csv",
+    "results/experiments/phase3_robustness/synthetic_conditions.png",
+    "results/experiments/phase3_robustness/synthetic_per_subject.csv",
+    "results/experiments/phase3_robustness/synthetic_summary.csv",
+    "results/experiments/phase3_robustness/synthetic_window_details.csv.gz"
+  ],
+  "versions": {
+    "python": "3.12.3",
+    "platform": "Linux-6.18.44-fc-v726-x86_64-with-glibc2.39",
+    "numpy": "1.26.4",
+    "pandas": "2.3.3",
+    "scipy": "1.17.1",
+    "sklearn": "1.4.0",
+    "torch": "2.15.0+cu132",
+    "joblib": "1.3.2"
+  },
+  "notes": [
+    "Clean live re-run vs frozen learned decisions: 100.0000% agreement.",
+    "Synthetic perturbations alter copies of real held-out recordings; no participants or recordings were created.",
+    "Natural subgroups use measured accelerometer motion, not activity labels; activity labels are not present in the processed files.",
+    "Motion quartile edges (g): [0.0, 0.02, 0.0892, 0.2316, 0.5807]"
+  ]
+}

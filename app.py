@@ -18,6 +18,7 @@ from src.evaluation.reliability_features import extract_reliability_features
 from src.evaluation.reliability_baseline import FEATURE_COLUMNS
 from src.agents.fitted_q_inference import load_fitted_q_policy
 from src.agents.investigation_environment import InvestigationEnvironment
+from src.agents.investigation_explanations import explain_investigation
 
 
 st.set_page_config(
@@ -385,7 +386,14 @@ def show_investigation(result):
         )
 
         if action in findings:
-            with st.expander(f"View findings: {name}"):
+            explanation = explain_investigation(
+                action,
+                findings[action],
+            )
+
+            st.info(explanation)
+
+            with st.expander(f"View technical measurements: {name}"):
                 st.json(findings[action])
 
     st.caption(

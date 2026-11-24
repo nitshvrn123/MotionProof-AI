@@ -1,0 +1,38 @@
+{
+  "name": "phase3_robustness",
+  "description": "Full-pipeline robustness of CNN, reliability classifier and policies on held-out test recordings.",
+  "subjects": [13, 14, 15],
+  "seed": 42,
+  "seed_rule": "rng seed = seed + 1000 * condition_index + subject",
+  "synthetic_conditions": [
+    {"perturbation": "clean", "level": 0, "group": "reference"},
+    {"perturbation": "gaussian_noise", "level": 0.05, "group": "PPG noise"},
+    {"perturbation": "gaussian_noise", "level": 0.10, "group": "PPG noise"},
+    {"perturbation": "gaussian_noise", "level": 0.20, "group": "PPG noise"},
+    {"perturbation": "gaussian_noise", "level": 0.50, "group": "PPG noise"},
+    {"perturbation": "accelerometer_coupled_artifact", "level": 0.25, "group": "Motion interference"},
+    {"perturbation": "accelerometer_coupled_artifact", "level": 0.50, "group": "Motion interference"},
+    {"perturbation": "accelerometer_coupled_artifact", "level": 1.00, "group": "Motion interference"},
+    {"perturbation": "periodic_motion_artifact", "level": 0.25, "group": "Motion interference"},
+    {"perturbation": "periodic_motion_artifact", "level": 0.50, "group": "Motion interference"},
+    {"perturbation": "periodic_motion_artifact", "level": 1.00, "group": "Motion interference"},
+    {"perturbation": "baseline_wander", "level": 1.00, "group": "Signal degradation"},
+    {"perturbation": "amplitude_attenuation", "level": 0.50, "group": "Signal degradation"},
+    {"perturbation": "amplitude_attenuation", "level": 0.25, "group": "Signal degradation"},
+    {"perturbation": "signal_dropout", "level": 1.0, "group": "Signal degradation"},
+    {"perturbation": "signal_dropout", "level": 2.0, "group": "Signal degradation"},
+    {"perturbation": "clipping", "level": 0.10, "group": "Signal degradation"},
+    {"perturbation": "clipping", "level": 0.20, "group": "Signal degradation"}
+  ],
+  "units": {
+    "gaussian_noise": "noise std as a fraction of window PPG std",
+    "accelerometer_coupled_artifact": "artefact std as a fraction of window PPG std",
+    "periodic_motion_artifact": "2 Hz artefact std as a fraction of window PPG std",
+    "baseline_wander": "0.2 Hz drift amplitude as a fraction of window PPG std",
+    "amplitude_attenuation": "gain applied to the pulse waveform",
+    "signal_dropout": "seconds replaced by the window mean",
+    "clipping": "fraction clipped at each tail"
+  },
+  "natural_subgroups": {"variable": "std of accelerometer magnitude per window (g)", "bins": "quartiles over all test windows"},
+  "activity_labels": "not available: processed test files contain only ppg, acc, hr, subject, split"
+}

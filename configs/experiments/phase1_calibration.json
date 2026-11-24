@@ -1,0 +1,13 @@
+{
+  "name": "phase1_calibration",
+  "description": "Post-hoc calibration of the nonlinear reliability classifier probability.",
+  "fit_subjects": [11, 12],
+  "selection_protocol": "leave-one-subject-out within validation subjects (fit on one, score the other)",
+  "selection_metric": "brier",
+  "tie_breaker": "ece",
+  "candidates": ["original", "platt", "isotonic"],
+  "ece_bins": 15,
+  "decision_threshold": 0.5,
+  "evaluation_subjects": [13, 14, 15],
+  "seed": 42
+}

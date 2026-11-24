@@ -1,0 +1,3 @@
+[server]
+# Serves ./static (bundled fonts for app_d3.py) at /app/static. No effect on app.py.
+enableStaticServing = true

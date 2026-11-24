@@ -1,4 +1,4 @@
-# Datasets
+# Datasets: raw PPG-DaLiA recordings and processed participant windows stay local
 data/raw/
 data/processed/
 
@@ -15,42 +15,66 @@ __pycache__/
 .ipynb_checkpoints/
 **/.ipynb_checkpoints/
 
-# Credentials
+# Credentials and local configuration
 .env
 .env.*
 !.env.example
+.streamlit/secrets.toml
 
 # System files and logs
 .DS_Store
 *.log
 
-# Checkpoints: include only the three required models
+# Checkpoints: the three production models plus D3 experimental artifacts
 checkpoints/*
 !checkpoints/ppg_cnn_best.pt
 !checkpoints/reliability_classifier_nonlinear_full.joblib
 !checkpoints/learned_policy_fitted_q_full.pt
+!checkpoints/experimental/
 
-# Results: include selected evaluation summaries
+# Results: selected evaluation outputs only
 results/*
 !results/metrics/
 results/metrics/*
 !results/metrics/final_test/
 results/metrics/final_test/*
 
+# Frozen D2 held-out evaluation (all files are listed in configs/frozen_artifacts.json)
 !results/metrics/final_test/test_policy_comparison.csv
 !results/metrics/final_test/test_policy_per_subject.csv
-!results/metrics/final_test/investigation_budget_ablation.csv
-!results/metrics/final_test/investigation_action_ablation.csv
-!results/metrics/final_test/ppg_noise_robustness.csv
+!results/metrics/final_test/test_policy_decisions.csv
+!results/metrics/final_test/test_policy_inputs_nonlinear.csv
 !results/metrics/final_test/test_policy_error_audit.csv
+!results/metrics/final_test/investigation_budget_ablation.csv
+!results/metrics/final_test/investigation_budget_ablation_details.csv
+!results/metrics/final_test/investigation_action_ablation.csv
+!results/metrics/final_test/investigation_action_ablation_details.csv
+!results/metrics/final_test/ppg_noise_robustness.csv
+!results/metrics/final_test/ppg_noise_robustness_details.csv
 !results/metrics/final_test/reproducibility_manifest.json
 
+# Training histories
 !results/metrics/ppg_cnn_training_history.csv
 !results/metrics/fitted_q_full_training.csv
 
-# Local backups
+# Inputs needed to rerun the D3 experiments (derived from PPG-DaLiA, CC BY 4.0)
+!results/metrics/validation_policy_inputs_nonlinear.csv
+!results/metrics/nonlinear_validation/
+results/metrics/nonlinear_validation/*
+!results/metrics/nonlinear_validation/validation_policy_decisions.csv
+!results/metrics/policy_investigation_states_full.csv.gz
+
+# D3 outputs: app trace cache and post-D2 experiments (parsing cache excluded)
+!results/demo/
+!results/experiments/
+results/experiments/cache/
+
+# Local backups and one-off development scripts
 *.backup
+backups/
 app_backup_*.py
 app_before_*.py
+app_d3_before_*.py
 app_prototype.py
+upgrade_motionproof_ui.py
 /=

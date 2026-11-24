@@ -1,0 +1,130 @@
+{
+  "created_utc": "2026-11-23T20:48:12+00:00",
+  "config": {
+    "name": "phase2_fp_reduction",
+    "description": "Controlled false-positive reduction experiments around the frozen learned policy.",
+    "selection_split": "validation (S11, S12)",
+    "selection_rule": {
+      "objective": "minimize validation false_positive_rate",
+      "constraint": "validation recall >= original learned policy validation recall - recall_tolerance",
+      "recall_tolerance": 0.05,
+      "tie_breaker": "higher validation f1"
+    },
+    "reporting_reward": "original InvestigationRewardConfig (TP +2, FP -1.5, FN -2, TN 0, cost 0.1 per check)",
+    "calibrator": "checkpoints/experimental/calibration/platt_calibrator.joblib (selected in phase 1)",
+    "families": {
+      "probability_threshold": {
+        "description": "No investigation; flag if calibrated p >= tau",
+        "tau_grid": [
+          0.05,
+          0.95,
+          0.01
+        ]
+      },
+      "agent_calibrated_veto": {
+        "description": "Original agent runs unchanged; a FLAG is kept only if calibrated p >= tau",
+        "tau_grid": [
+          0.05,
+          0.95,
+          0.01
+        ]
+      },
+      "bayes_cost_rule": {
+        "description": "No investigation; flag if calibrated p exceeds the expected-reward break-even point for a cost setting (no tuning)",
+        "false_positive_penalties": [
+          -1.5,
+          -2.0,
+          -2.5,
+          -3.0
+        ]
+      },
+      "reward_retrained_policy": {
+        "description": "Fitted Q retrained on S1-S10 with the original procedure and an alternative reward",
+        "variants": {
+          "original_reward_retrain": {
+            "false_positive_penalty": -1.5,
+            "investigation_cost": 0.1
+          },
+          "fp2.0": {
+            "false_positive_penalty": -2.0,
+            "investigation_cost": 0.1
+          },
+          "fp2.5": {
+            "false_positive_penalty": -2.5,
+            "investigation_cost": 0.1
+          },
+          "fp3.0": {
+            "false_positive_penalty": -3.0,
+            "investigation_cost": 0.1
+          },
+          "cost0.05": {
+            "false_positive_penalty": -1.5,
+            "investigation_cost": 0.05
+          },
+          "cost0.2": {
+            "false_positive_penalty": -1.5,
+            "investigation_cost": 0.2
+          }
+        },
+        "seeds": [
+          42,
+          43,
+          44
+        ],
+        "selection_uses": "mean of validation metrics across seeds"
+      }
+    },
+    "seed": 42,
+    "notes": [
+      "Retraining the original reward reproduces training losses closely but not bit-exactly (hardware nondeterminism); test decision agreement with the production checkpoint is 91.2%. Variants are therefore compared with 'original_reward_retrain' trained under identical conditions, using three seeds."
+    ]
+  },
+  "inputs": {
+    "results/metrics/nonlinear_validation/validation_policy_decisions.csv": "ebdbcc353a8bbcbc18fc25ef7d3e7d62ab4cf51bf14af8a412b92d7fa315affd",
+    "results/metrics/final_test/test_policy_decisions.csv": "b83c7ca1845798307d2b019ecdcb26a1e345015cd689749303ecd49ee24c3aa1",
+    "results/metrics/final_test/test_policy_comparison.csv": "45440dc77ee6254c646d1a1063eb9d7f0512207aef6909212f714736cb99272d",
+    "checkpoints/experimental/calibration/platt_calibrator.joblib": "0a99ebf2ad38182f1f346323b3b7a275d357d5d820d69c89575211c7a976ec35",
+    "checkpoints/experimental/policies/fitted_q_original_reward_retrain.pt": "8e009424bd192df8526ee4c54d01dc9215550a07d817801891ebd174ccb50667",
+    "checkpoints/experimental/policies/fitted_q_original_reward_retrain_seed43.pt": "b66a260561b9e261ae9165f44aff28171bf2d249731b45b442fc571764dfda2b",
+    "checkpoints/experimental/policies/fitted_q_original_reward_retrain_seed44.pt": "62a06c89e8b1adcefc3fbd90a5654ce5b07c3a2d28b56e42401ea170579201a6",
+    "checkpoints/experimental/policies/fitted_q_fp2.0.pt": "215b6bba120f838094ad8f0400d31a0e2ca1c073d1a3acd1df79d4c208e58583",
+    "checkpoints/experimental/policies/fitted_q_fp2.0_seed43.pt": "1e5279fafb41e7a95321eb06be8df4da3909f519153439794f8ee80148a01284",
+    "checkpoints/experimental/policies/fitted_q_fp2.0_seed44.pt": "6e6711fc9975cf8c16f93459ee16d075bdae86e26b46b225bc73921cb88865ab",
+    "checkpoints/experimental/policies/fitted_q_fp2.5.pt": "839853eef1738c2d6c4db28cd1b76b3d037df01d2e684acdf3c63b5975034401",
+    "checkpoints/experimental/policies/fitted_q_fp2.5_seed43.pt": "43c871b38a57995b7032e7afccbaa760d744340fc2cfc9251a19e411fdebefd6",
+    "checkpoints/experimental/policies/fitted_q_fp2.5_seed44.pt": "a5f5d3dfa6489b330510e22f63b3dc6cd7b39b04e048cbfe044fd838e0d80272",
+    "checkpoints/experimental/policies/fitted_q_fp3.0.pt": "9dea88a72134f592c02898d35b13a7bb8cb07295e10b73c332a818b40b58869c",
+    "checkpoints/experimental/policies/fitted_q_fp3.0_seed43.pt": "1aa8b35dcbeaea0268ec1b0f529d4b57d7a7f6b69ba223076a174a48047dc602",
+    "checkpoints/experimental/policies/fitted_q_fp3.0_seed44.pt": "583fc0f826813523138b4feb05cdb47190694fdec86ab468ccaf1460a15dd735",
+    "checkpoints/experimental/policies/fitted_q_cost0.05.pt": "5a8d1ba0a753ee92674fbf2ca9fe95a7a583ea97c2085d103f48e4bce1d2d29e",
+    "checkpoints/experimental/policies/fitted_q_cost0.05_seed43.pt": "e61f9946fc7f68ec47a1bcc702c96d98d4ab4338c43d4ef079fda4a2388038b9",
+    "checkpoints/experimental/policies/fitted_q_cost0.05_seed44.pt": "f2ddc82f9c24408284ee8924c9b3fa497d976cb970e07f25e7e1845c1735853d",
+    "checkpoints/experimental/policies/fitted_q_cost0.2.pt": "64e829e2452822e15fdc4a6c0655c8f11c2eede143b2cdaed30b7dee96f8d1a0",
+    "checkpoints/experimental/policies/fitted_q_cost0.2_seed43.pt": "336d8c0aa547a119c3ac2edde6c48d71053116b587d942aeb28501431414a648",
+    "checkpoints/experimental/policies/fitted_q_cost0.2_seed44.pt": "8d1257b7931f30e807c0beae69fb545c420dc438fda65f14c583a79a5bc0007e"
+  },
+  "outputs": [
+    "results/experiments/phase2_fp_reduction/reward_sensitivity.csv",
+    "results/experiments/phase2_fp_reduction/selection.json",
+    "results/experiments/phase2_fp_reduction/test_all_candidates_reporting_only.csv",
+    "results/experiments/phase2_fp_reduction/test_comparison.csv",
+    "results/experiments/phase2_fp_reduction/test_decisions_original_reward_retrain_seed42.csv",
+    "results/experiments/phase2_fp_reduction/test_decisions_original_reward_retrain_seed43.csv",
+    "results/experiments/phase2_fp_reduction/test_decisions_original_reward_retrain_seed44.csv",
+    "results/experiments/phase2_fp_reduction/validation_candidates.csv",
+    "results/experiments/phase2_fp_reduction/validation_tradeoff.png"
+  ],
+  "versions": {
+    "python": "3.12.3",
+    "platform": "Linux-6.18.44-fc-v726-x86_64-with-glibc2.39",
+    "numpy": "1.26.4",
+    "pandas": "2.3.3",
+    "scipy": "1.17.1",
+    "sklearn": "1.4.0",
+    "torch": "2.15.0+cu132",
+    "joblib": "1.3.2"
+  },
+  "notes": [
+    "Selection used validation only; test rows of non-selected candidates are saved for transparency and were not used for any choice."
+  ]
+}
