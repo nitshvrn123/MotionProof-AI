@@ -127,6 +127,100 @@ Level units are in `configs/experiments/phase3_robustness.json`: noise and artef
 
 Outputs: `results/experiments/phase3_robustness/`, including per-window details, per-participant results under each perturbation, and `synthetic_conditions.png`.
 
+## D4: extended evaluation
+
+No model was trained or retrained in D4. The frozen D2 CNN, reliability classifier and fitted Q policy, and the D3 Platt calibrator, are used unchanged. Every choice (motion-level edges, thresholds) was made on validation participants S11–S12; test participants S13–S15 were evaluated once, after selection. Configs: `configs/experiments/d4_motion_thresholds.json` and `configs/experiments/d4_evaluation.json`. Notebook: `notebooks/D4_Extended_Evaluation.ipynb`.
+
+### D4.1 Motion-aware veto thresholds
+
+**Question.** Can separate veto thresholds per motion level reduce false alarms without a large loss of failure detection?
+
+**Method.** Motion intensity is the standard deviation of accelerometer magnitude per window (g). Three levels use the tertiles of pooled validation motion (edges 0.048 g and 0.221 g); test windows use the same edges. The frozen agent runs unchanged, and a FLAG is kept only if the calibrated probability is at least the threshold for that window's motion level (τ = 0.00 means no veto in that level). The comparison is against the frozen agent and the D3 global veto (one τ for all windows). The selection rule and success criteria were written in the config before running:
+
+- Selection: lowest validation FPR with validation recall at least the frozen agent's validation recall minus 5 points (floor 80.7%).
+- C1: on validation, the motion-aware veto lowers FPR by at least 1 point compared with the global veto.
+- C2: leave-one-participant-out inside validation. The motion edges and both vetoes' thresholds are re-selected on one validation participant and evaluated on the other. This re-selects thresholds only; no model is retrained. In both folds the motion-aware veto must have lower held-out FPR than the global veto and keep held-out recall within 5 points of the frozen agent.
+- Motion-aware thresholds are supported only if C1 and C2 both hold.
+- C3: test confirmation, reported once and not used for selection.
+
+Selected thresholds: global τ = 0.26; motion-aware τ = 0.56 (low), 0.23 (moderate), 0.20 (high).
+
+| Split | Policy | Recall | FPR | F1 |
+|---|---|---|---|---|
+| Validation | Frozen agent (D2) | 85.7% | 39.9% | 0.648 |
+| Validation | Global calibrated veto | 81.3% | 36.7% | 0.641 |
+| Validation | Motion-aware veto | 80.8% | 34.9% | 0.648 |
+| Test | Frozen agent (D2) | 88.1% | 39.6% | 0.406 |
+| Test | Global calibrated veto | 80.9% | 35.4% | 0.404 |
+| Test | Motion-aware veto | 79.9% | 35.2% | 0.401 |
+
+Leave-one-participant-out check (C2), threshold re-selection within validation only:
+
+| Selected on → evaluated on | Global veto recall / FPR | Motion-aware recall / FPR | Held-out recall floor | Fold |
+|---|---|---|---|---|
+| S11 → S12 | 78.9% / 32.2% | 76.0% / 32.0% | 76.6% | Fail |
+| S12 → S11 | 82.3% / 40.5% | 76.3% / 39.2% | 84.5% | Fail |
+
+**Result: not supported.** C1 passed (1.8 points lower validation FPR). C2 failed: the motion-aware veto had lower held-out FPR in both folds but fell below the recall floor in both. C3 also failed: test FPR is only 0.2 points lower than the global veto, and recall (79.9%) is below the test floor of 83.1%. Per motion level on test, the gain comes almost entirely from low-motion windows, where recall falls from 72.6% (frozen agent) to 22.8%; high-motion FPR stays at 75.4% (76.7% for the frozen agent).
+
+Outputs: `results/experiments/d4_motion_thresholds/` (selection, validation and test comparisons, per-level tables, LOSO folds, `per_level_comparison.png`, per-window `test_decisions.csv` used by D4.2–D4.4).
+
+### D4.2 Participant-wise results
+
+Held-out test, per participant (no training, no selection):
+
+| Participant | CNN MAE (BPM) | Unreliable | Classifier AUC | Fixed rule recall / FPR | Agent recall / FPR | Global veto recall / FPR | Motion-aware recall / FPR |
+|---|---|---|---|---|---|---|---|
+| S13 | 4.78 | 11.3% | 0.799 | 84.0% / 31.3% | 94.2% / 37.9% | 90.9% / 34.8% | 88.2% / 34.9% |
+| S14 | 5.39 | 13.0% | 0.686 | 76.4% / 46.0% | 82.6% / 48.2% | 79.0% / 46.1% | 74.7% / 42.5% |
+| S15 | 6.13 | 17.8% | 0.826 | 55.4% / 16.1% | 88.2% / 31.5% | 75.2% / 23.4% | 78.0% / 26.8% |
+
+**Reading.** The agent has the highest recall for every participant. Its recall gain over the fixed rule ranges from 6.2 points (S14) to 32.9 points (S15). S14 is the hardest participant: the lowest classifier AUC and the highest false-positive rate under every policy.
+
+Outputs: `results/experiments/d4_participant_analysis/` (`participant_metrics.csv`, `classifier_auc_by_motion.csv`, `participant_comparison.png`).
+
+### D4.3 Uncertainty: moving-block bootstrap
+
+**Method.** Consecutive windows overlap by 6 s, so windows are not independent. Blocks of 30 consecutive windows (about 68 s of signal) are resampled within each test participant, keeping each participant's size. All policies are scored on the same resampled windows, so differences are paired. 2,000 resamples, 95% percentile intervals, seed 42. Block lengths of 15, 60 and 120 windows are reported as a sensitivity check.
+
+Paired differences on test, block length 30 (percentage points; F1 × 100):
+
+| Comparison | Recall | FPR | F1 |
+|---|---|---|---|
+| Agent − fixed rule | +17.8 (14.9 to 20.7) | +7.6 (6.2 to 9.0) | +2.5 (1.2 to 3.8) |
+| Agent − no investigation | +29.4 (24.5 to 34.2) | +8.4 (6.6 to 10.2) | +7.3 (5.1 to 9.7) |
+| Global veto − agent | −7.2 (−8.9 to −5.6) | −4.2 (−4.7 to −3.7) | −0.2 (−0.9 to 0.5) |
+| Motion-aware veto − agent | −8.3 (−11.0 to −5.9) | −4.4 (−5.1 to −3.8) | −0.5 (−1.5 to 0.4) |
+| Motion-aware veto − global veto | −1.1 (−3.6 to 1.2) | −0.2 (−0.9 to 0.3) | −0.3 (−1.2 to 0.6) |
+
+**Reading.** The agent's recall gain and its higher FPR relative to the fixed rule both have intervals that exclude zero, at every block length tested (15–120 windows). The motion-aware and global vetoes cannot be distinguished. With only three participants, these intervals describe variation within these recordings, not the wider population.
+
+Outputs: `results/experiments/d4_bootstrap/` (`metric_intervals.csv`, `paired_differences.csv`, `paired_differences_by_participant.csv`, `paired_differences.png`).
+
+### D4.4 Failure cases
+
+**Method.** Every test window is assigned to one category from the frozen agent's decision: caught failure, missed failure, false alarm or correct accept. Investigation measurements (pulse spectrum, motion, temporal consistency) are recomputed with the same deterministic tools the agent uses. Representative examples are chosen by a fixed rule: the window closest to the category median of standardized calibrated probability, motion intensity and absolute error.
+
+| Category | Windows | Median p | Share in high motion | Decided without checks |
+|---|---|---|---|---|
+| Caught failure | 1,590 | 0.60 | 56.7% | 39.7% |
+| Missed failure | 214 | 0.28 | 20.1% | 7.9% |
+| False alarm | 4,437 | 0.61 | 45.1% | 49.2% |
+| Correct accept | 6,766 | 0.11 | 9.0% | 33.5% |
+
+**Reading.**
+
+1. The classifier is near chance within high-motion windows (AUC 0.53, compared with 0.64 in moderate and 0.89 in low motion). This is why no threshold removes high-motion false alarms.
+2. About half of false alarms (49.2%) are flagged without any check.
+3. Missed failures are mostly low-probability, low-motion windows that the agent did investigate (only 7.9% were decided without checks).
+4. Compared with the probability-only rule (flag if p ≥ 0.5), investigations caught 577 extra failures and avoided 637 false alarms, but raised 1,580 false alarms and caused 45 misses.
+
+Outputs: `results/experiments/d4_failure_cases/` (`category_summary.csv`, `category_by_motion.csv`, `investigation_changes.csv`, `representative_examples.csv`, `representative_examples.png`, per-window `window_findings.csv.gz`).
+
+### D4.5 Usability study materials
+
+`docs/usability/` holds the protocol, four tasks, the SUS questionnaire and an empty response template for an exploratory 3–5 person check of the interface. `python -m src.experiments.score_usability <responses.csv>` scores the responses. The study had not been run when these materials were added, so no usability results are reported here.
+
 ## Limitations
 
 - Calibration and Phase 2 selection rely on two validation participants. The S11–S12 versus S13–S15 difference in failure rate shows how much participants vary.

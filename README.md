@@ -2,7 +2,7 @@
 
 **Adaptive agent investigation for reliable heart-rate estimation from wrist PPG**
 
-EEE 6778 Applied Machine Learning II, University of Florida. Deliverable 3: refinement, evaluation and interface (November 2026).
+EEE 6778 Applied Machine Learning II, University of Florida. Deliverable 4: extended evaluation, statistical analysis and reproducibility (November 2026). D4 builds on the D2 prototype and the D3 interface without retraining any model.
 
 MotionProof AI estimates heart rate from a wrist-worn photoplethysmography (PPG) sensor and then asks a second question: **should this estimate be trusted?** A reliability classifier scores each prediction, and a learned investigation agent decides whether to accept it, flag it, or first spend a limited budget of checks on the pulse signal, the motion data or recent predictions.
 
@@ -125,7 +125,7 @@ Signals are cut into 8-second windows with a 2-second stride: 512 PPG samples, 2
 | Split | Participants | Windows | Used for |
 |---|---|---|---|
 | Training | S1–S10 | 43,215 | CNN, reliability classifier, fitted Q policy |
-| Validation | S11, S12 | 8,475 | Model selection, calibration fitting, D3 experiment selection |
+| Validation | S11, S12 | 8,475 | Model selection, calibration fitting, D3 and D4 experiment selection |
 | Held-out test | S13, S14, S15 | 13,007 | Reporting only; never used for tuning or selection |
 
 **Not included in this repository.** The raw recordings (`data/raw/PPG_FieldStudy/`) and the processed participant windows (`data/processed/val/*.npz`, `data/processed/test/*.npz`) are not included. To rebuild them, download PPG-DaLiA and run `notebooks/setup.ipynb`, which creates the windows with `src/preprocessing/`.
@@ -225,7 +225,7 @@ No training. Choices were made on validation participants S11–S12 only, and th
 
 **1. Motion-aware thresholds: not supported.** One veto threshold per motion level (low / moderate / high, tertiles of validation motion) was compared with the frozen agent and the D3 global veto. The success criteria were written in `configs/experiments/d4_motion_thresholds.json` before running.
 
-- It passed the validation criterion, but failed the leave-one-participant-out check in both folds and failed the test confirmation.
+- It passed the validation criterion (C1), but failed the leave-one-participant-out check (C2) in both folds and failed the test confirmation (C3). In that check the motion edges and veto thresholds were re-selected on one validation participant (S11 or S12) and evaluated on the other; test participants were not used, and no model was retrained.
 - On test it lowers the false-positive rate by only 0.2 points versus the global veto (35.2% vs 35.4%), and recall drops to 79.9%.
 - It gets its gains by removing low-motion flags: low-motion recall falls from 72.6% to 22.8%.
 
@@ -259,12 +259,14 @@ python -m src.experiments.run_calibration        # D3 calibration study
 python -m src.experiments.train_reward_variants  # D3 reward variants (18 policies)
 python -m src.experiments.run_fp_reduction       # D3 false-positive study (needs val/test recordings)
 python -m src.experiments.run_robustness         # D3 robustness study (needs test recordings)
-bash scripts/reproduce_experiments.sh            # all of the above in order
 python -m src.experiments.run_motion_thresholds    # D4 motion-aware thresholds (needs val/test recordings)
 python -m src.experiments.run_participant_analysis # D4 participant-wise results
 python -m src.experiments.run_bootstrap            # D4 block-bootstrap intervals
 python -m src.experiments.run_failure_cases        # D4 failure cases (needs test recordings)
+bash scripts/reproduce_experiments.sh            # all of the above in order
 ```
+
+The notebooks need Jupyter, which is not in `requirements.txt` because the app, scripts and tests do not use it: `python -m pip install jupyterlab ipykernel`.
 
 - **Configuration tracking.** Each experiment reads a JSON config in `configs/experiments/` and writes a `manifest.json` with input hashes and package versions.
 - **Separate experimental checkpoints.** Experimental checkpoints live in `checkpoints/experimental/` and never replace the production models.
@@ -283,16 +285,17 @@ MotionProof-AI/
 │   ├── models/                  PPG CNN and datasets
 │   ├── agents/                  environment, tools, policies, fitted Q inference and training
 │   ├── evaluation/              D2 evaluation scripts, app trace builder
-│   └── experiments/             D3 calibration, false-positive, robustness studies
+│   └── experiments/             D3 calibration, false-positive and robustness studies; D4 motion-aware
+│                                thresholds, participant analysis, bootstrap, failure cases, usability scoring
 ├── checkpoints/                 three production models
 │   └── experimental/            D3 calibrators and retrained policies
-├── configs/                     experiment configs, frozen-artifact hashes
+├── configs/                     experiment configs (D3 and D4), frozen-artifact hashes
 ├── results/
 │   ├── metrics/final_test/      frozen D2 held-out evaluation
 │   ├── demo/                    verified agent traces for the app
-│   └── experiments/             D3 study outputs
-├── docs/                        EXPERIMENTS.md, REPRODUCIBILITY.md, screenshots
-├── notebooks/                   setup and D2 notebooks
+│   └── experiments/             D3 study outputs (phase1–3) and D4 outputs (d4_*)
+├── docs/                        EXPERIMENTS.md, REPRODUCIBILITY.md, screenshots, usability/ (D4 study materials)
+├── notebooks/                   setup, D2, D3 and D4 notebooks
 ├── scripts/                     reproduce_experiments.sh
 ├── static/fonts/                bundled interface fonts (SIL OFL)
 └── tests/
@@ -301,7 +304,7 @@ MotionProof-AI/
 ## Known limitations
 
 - **Few participants.** Only three held-out participants and two validation participants. Results vary noticeably between participants.
-- **False positives remain high.** The learned agent's false-positive rate, especially during movement, is its main weakness, and none of the tested alternatives removed it without losing recall.
+- **False positives remain high.** The learned agent's false-positive rate, especially during movement, is its main weakness, and none of the tested alternatives, including the D4 motion-aware thresholds, removed it without losing recall.
 - **Calibration under shift.** Calibration fitted on S11–S12 does not fully transfer to S13–S15 because failure rates differ between participants.
 - **Training nondeterminism.** Retrained policies vary by several points between seeds and hardware.
 - **Simplified perturbations.** The synthetic perturbations are simplified stand-ins for real artefacts. Activity-level analysis was not possible because activity labels are only in the raw recordings.

@@ -1,6 +1,6 @@
 # Reproducibility guide
 
-How to rebuild the MotionProof AI environment, check that the frozen D2 results are intact, and rerun every post-D2 experiment.
+How to rebuild the MotionProof AI environment, check that the frozen D2 results are intact, and rerun every post-D2 experiment (D3 Phases 1–3 and the D4 extended evaluation).
 
 ## 1. Environment
 
@@ -16,6 +16,15 @@ python -m pytest -q
 ```
 
 On a machine without a GPU everything runs on CPU. No step needs CUDA.
+
+**Notebooks (optional).** Jupyter is not in `requirements.txt`, because the app, the scripts and the tests do not need it. To open or re-execute the notebooks, install it into the same environment:
+
+```bash
+python -m pip install jupyterlab ipykernel
+jupyter lab notebooks/D4_Extended_Evaluation.ipynb
+```
+
+The D4 notebook only calls repository code and reads saved results, so the Jupyter version does not affect any number. It runs without the processed participant recordings.
 
 ## 2. Data and splits
 
@@ -48,6 +57,9 @@ Raw PPG-DaLiA recordings (`data/raw/PPG_FieldStudy/S*/S*.pkl`, CC BY 4.0, from t
 | Reliability classifier | `random_state=42` | `src/evaluation/reliability_nonlinear.py` |
 | Phase 2 reward variants | 42, 43, 44 | `configs/experiments/phase2_fp_reduction.json` |
 | Phase 3 perturbations | 42 + 1000 × condition + subject | `configs/experiments/phase3_robustness.json` |
+| D4 block bootstrap | 42 | `configs/experiments/d4_evaluation.json` |
+
+The D4 motion-aware threshold search is deterministic (a fixed grid), so it has no seed of its own.
 
 ## 4. Checkpoints
 
@@ -87,7 +99,19 @@ python -m src.experiments.run_calibration        # Phase 1
 python -m src.experiments.train_reward_variants  # Phase 2 policies (skips existing)
 python -m src.experiments.run_fp_reduction       # Phase 2 selection and test evaluation
 python -m src.experiments.run_robustness         # Phase 3
+python -m src.experiments.run_motion_thresholds  # D4.1 motion-aware veto (needs val/test recordings)
+python -m src.experiments.run_participant_analysis  # D4.2 per-participant results
+python -m src.experiments.run_bootstrap          # D4.3 moving-block bootstrap
+python -m src.experiments.run_failure_cases      # D4.4 failure cases (needs test recordings)
 python -m pytest -q
+```
+
+D4 trains nothing. Run `run_motion_thresholds` first: the other three D4 scripts read its `test_decisions.csv`, which is included, so they can also be run on their own. `run_participant_analysis` and `run_bootstrap` need only files in the repository. The D4 thresholds were re-selected inside validation for the leave-one-participant-out check; no model was retrained for it.
+
+To score the usability study once responses have been collected:
+
+```bash
+python -m src.experiments.score_usability docs/usability/responses.csv
 ```
 
 Retrain a single policy with a custom reward:
@@ -108,11 +132,17 @@ results/
     phase1_calibration/
     phase2_fp_reduction/
     phase3_robustness/
+    d4_motion_thresholds/
+    d4_participant_analysis/
+    d4_bootstrap/
+    d4_failure_cases/
     cache/            parsed training states (rebuilt automatically, safe to delete)
 ```
 
 ## 7. Known sources of nondeterminism
 
 Retraining the production policy with its original procedure on this CPU reproduces the training losses closely but not exactly: the largest per-epoch difference is 0.058. 91.2% of held-out decisions agree with the production checkpoint. Floating-point order differs between the original GPU run and CPU, and the Q-values of different investigation actions are often nearly tied. This is why Phase 2 compares reward variants against a policy retrained with the original reward under the same conditions (`original_reward_retrain`), over three seeds, rather than against the production checkpoint.
+
+The D4 scripts involve no training. Re-running them reproduces every CSV and figure exactly. Only the timestamps in `manifest.json` and in the gzip header of `window_findings.csv.gz` change. Manifests also record the machine that produced them: the committed D4 manifests were generated on Linux.
 
 Live inference in the app matches the frozen evaluation: CNN heart rate within 0.009 BPM and classifier probability within 0.031. Frozen agent decisions are reproduced on every test window checked (13,007 of 13,007 in the trace cache) and on all 8,475 validation windows.
