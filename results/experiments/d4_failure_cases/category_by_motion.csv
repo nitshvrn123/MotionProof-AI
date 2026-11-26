@@ -1,0 +1,5 @@
+category,low,moderate,high
+caught_failure,172,516,902
+correct_accept,4036,2124,606
+false_alarm,363,2075,1999
+missed_failure,65,106,43

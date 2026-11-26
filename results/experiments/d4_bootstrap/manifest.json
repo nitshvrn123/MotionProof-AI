@@ -1,0 +1,68 @@
+{
+  "created_utc": "2026-11-26T04:28:50+00:00",
+  "config": {
+    "method": "moving-block bootstrap within each test participant (participant sizes kept), paired across policies",
+    "primary_block_windows": 30,
+    "block_sensitivity_windows": [
+      15,
+      30,
+      60,
+      120
+    ],
+    "replicates": 2000,
+    "confidence": 0.95,
+    "interval": "percentile",
+    "seed": 42,
+    "comparisons": [
+      [
+        "Learned Fitted Q",
+        "Fixed Rule"
+      ],
+      [
+        "Learned Fitted Q",
+        "No Investigation"
+      ],
+      [
+        "Global calibrated veto",
+        "Learned Fitted Q"
+      ],
+      [
+        "Motion-aware veto",
+        "Learned Fitted Q"
+      ],
+      [
+        "Motion-aware veto",
+        "Global calibrated veto"
+      ]
+    ],
+    "metrics": [
+      "recall",
+      "false_positive_rate",
+      "f1",
+      "precision"
+    ],
+    "caveat": "Intervals describe variation within these three participants' recordings, not the wider population; consecutive windows overlap by 6 s, so blocks of 30 windows (about 68 s of signal) preserve short-range dependence."
+  },
+  "inputs": {
+    "results/metrics/final_test/test_policy_inputs_nonlinear.csv": "4e2d7c158f1c4602697884a073218c10364cbad5a8ea14a1328e4e0e23c4f07e",
+    "results/metrics/final_test/test_policy_decisions.csv": "b83c7ca1845798307d2b019ecdcb26a1e345015cd689749303ecd49ee24c3aa1",
+    "results/experiments/d4_motion_thresholds/test_decisions.csv": "0dd5deadc54b750407973fd0c2ab83ae341c1e82812b10b6b3f60039943a1ad4"
+  },
+  "outputs": [
+    "results/experiments/d4_bootstrap/metric_intervals.csv",
+    "results/experiments/d4_bootstrap/paired_differences.csv",
+    "results/experiments/d4_bootstrap/paired_differences.png",
+    "results/experiments/d4_bootstrap/paired_differences_by_participant.csv"
+  ],
+  "versions": {
+    "python": "3.12.3",
+    "platform": "Linux-6.18.44-fc-v880-x86_64-with-glibc2.39",
+    "numpy": "1.26.4",
+    "pandas": "2.3.3",
+    "scipy": "1.17.1",
+    "sklearn": "1.4.0",
+    "torch": "2.15.0+cu132",
+    "joblib": "1.3.2"
+  },
+  "notes": []
+}

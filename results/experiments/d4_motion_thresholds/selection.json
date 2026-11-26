@@ -1,0 +1,19 @@
+{
+  "motion_edges_g": [
+    0.04791072169383179,
+    0.2209992512568949
+  ],
+  "validation_recall_floor": 0.8069424964936885,
+  "global_veto_tau": 0.26,
+  "motion_aware_taus": {
+    "low": 0.56,
+    "moderate": 0.23,
+    "high": 0.2
+  },
+  "criteria": {
+    "C1_validation_gain": true,
+    "C2_out_of_participant": false,
+    "motion_aware_supported": false,
+    "C3_test_confirmation": false
+  }
+}

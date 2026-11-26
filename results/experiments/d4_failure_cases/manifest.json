@@ -1,0 +1,39 @@
+{
+  "created_utc": "2026-11-26T04:32:02+00:00",
+  "config": {
+    "categories": {
+      "caught_failure": "agent flags, window unreliable",
+      "missed_failure": "agent accepts, window unreliable",
+      "false_alarm": "agent flags, window reliable",
+      "investigation_changed_decision": "agent used >= 1 check and its final decision differs from the probability-only rule (p >= 0.5)"
+    },
+    "representative_example": "window closest to the category median of standardized (p, motion intensity, absolute error); chosen by rule, not by hand"
+  },
+  "inputs": {
+    "results/metrics/final_test/test_policy_inputs_nonlinear.csv": "4e2d7c158f1c4602697884a073218c10364cbad5a8ea14a1328e4e0e23c4f07e",
+    "results/metrics/final_test/test_policy_decisions.csv": "b83c7ca1845798307d2b019ecdcb26a1e345015cd689749303ecd49ee24c3aa1",
+    "results/experiments/d4_motion_thresholds/test_decisions.csv": "0dd5deadc54b750407973fd0c2ab83ae341c1e82812b10b6b3f60039943a1ad4",
+    "results/demo/learned_agent_traces.csv": "c433f212e8394156bfe863adae3376ea394801b5e7ba77821498bc6b92ac7ac2"
+  },
+  "outputs": [
+    "results/experiments/d4_failure_cases/category_by_motion.csv",
+    "results/experiments/d4_failure_cases/category_summary.csv",
+    "results/experiments/d4_failure_cases/investigation_changes.csv",
+    "results/experiments/d4_failure_cases/representative_examples.csv",
+    "results/experiments/d4_failure_cases/representative_examples.png",
+    "results/experiments/d4_failure_cases/window_findings.csv.gz"
+  ],
+  "versions": {
+    "python": "3.12.3",
+    "platform": "Linux-6.18.44-fc-v880-x86_64-with-glibc2.39",
+    "numpy": "1.26.4",
+    "pandas": "2.3.3",
+    "scipy": "1.17.1",
+    "sklearn": "1.4.0",
+    "torch": "2.15.0+cu132",
+    "joblib": "1.3.2"
+  },
+  "notes": [
+    "False alarms with absolute error between 8 and 10 BPM: 12.8%"
+  ]
+}

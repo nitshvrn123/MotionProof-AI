@@ -1,0 +1,41 @@
+{
+  "name": "d4_evaluation",
+  "description": "D4 supplementary analyses of frozen and D3/D4 decision rules on held-out test participants S13-S15. No training, no selection on test.",
+  "policies": {
+    "No Investigation": "frozen D2",
+    "Fixed Rule": "frozen D2",
+    "Learned Fitted Q": "frozen D2",
+    "Global calibrated veto": "D3, tau selected on validation",
+    "Motion-aware veto": "D4, thresholds selected on validation (configs/experiments/d4_motion_thresholds.json)"
+  },
+  "participant_analysis": {
+    "metrics": ["cnn_mae_bpm", "cnn_rmse_bpm", "unreliable_rate", "recall", "precision", "f1", "false_positive_rate", "average_investigations", "flag_rate"]
+  },
+  "bootstrap": {
+    "method": "moving-block bootstrap within each test participant (participant sizes kept), paired across policies",
+    "primary_block_windows": 30,
+    "block_sensitivity_windows": [15, 30, 60, 120],
+    "replicates": 2000,
+    "confidence": 0.95,
+    "interval": "percentile",
+    "seed": 42,
+    "comparisons": [
+      ["Learned Fitted Q", "Fixed Rule"],
+      ["Learned Fitted Q", "No Investigation"],
+      ["Global calibrated veto", "Learned Fitted Q"],
+      ["Motion-aware veto", "Learned Fitted Q"],
+      ["Motion-aware veto", "Global calibrated veto"]
+    ],
+    "metrics": ["recall", "false_positive_rate", "f1", "precision"],
+    "caveat": "Intervals describe variation within these three participants' recordings, not the wider population; consecutive windows overlap by 6 s, so blocks of 30 windows (about 68 s of signal) preserve short-range dependence."
+  },
+  "failure_cases": {
+    "categories": {
+      "caught_failure": "agent flags, window unreliable",
+      "missed_failure": "agent accepts, window unreliable",
+      "false_alarm": "agent flags, window reliable",
+      "investigation_changed_decision": "agent used >= 1 check and its final decision differs from the probability-only rule (p >= 0.5)"
+    },
+    "representative_example": "window closest to the category median of standardized (p, motion intensity, absolute error); chosen by rule, not by hand"
+  }
+}

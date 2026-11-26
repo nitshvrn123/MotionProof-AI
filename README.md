@@ -219,6 +219,34 @@ The selection rule, fixed in advance, was the lowest validation false-positive r
 
 ![Post-D2 studies in the Research Lab](docs/screenshots/07_d3_research_lab_post_d2.png)
 
+### D4 extended evaluation
+
+No training. Choices were made on validation participants S11–S12 only, and the frozen D2/D3 results are unchanged. Notebook: [`notebooks/D4_Extended_Evaluation.ipynb`](notebooks/D4_Extended_Evaluation.ipynb).
+
+**1. Motion-aware thresholds: not supported.** One veto threshold per motion level (low / moderate / high, tertiles of validation motion) was compared with the frozen agent and the D3 global veto. The success criteria were written in `configs/experiments/d4_motion_thresholds.json` before running.
+
+- It passed the validation criterion, but failed the leave-one-participant-out check in both folds and failed the test confirmation.
+- On test it lowers the false-positive rate by only 0.2 points versus the global veto (35.2% vs 35.4%), and recall drops to 79.9%.
+- It gets its gains by removing low-motion flags: low-motion recall falls from 72.6% to 22.8%.
+
+**2. Participant-wise results.** The agent has the highest recall for every test participant: S13 94.2%, S14 82.6%, S15 88.2%. Its gain over the fixed rule ranges from 6.2 to 32.9 points, and S14 has the highest false-positive rate (48.2%).
+
+**3. Uncertainty.** A moving-block bootstrap (blocks of 30 windows, resampled within each participant, 2,000 resamples) gives these agent − fixed rule differences:
+
+- recall **+17.8 points** (95% CI 14.9 to 20.7);
+- false-positive rate +7.6 points (6.2 to 9.0);
+- F1 +2.5 points (1.2 to 3.8).
+
+The result is stable across block lengths of 15–120 windows. With three participants, these intervals describe these recordings, not the population.
+
+**4. Failure cases.**
+
+- Within high-motion windows the classifier is close to chance (AUC 0.53, versus 0.89 in low motion), which is why no threshold fixes high-motion false alarms.
+- Half of false alarms are flagged without any check.
+- Compared with the probability-only rule, investigations caught 577 extra failures and avoided 637 false alarms, but raised 1,580 false alarms and caused 45 misses.
+
+**5. Usability study materials.** `docs/usability/` holds the protocol, tasks and questionnaire for an exploratory 3–5 person study. Score responses with `python -m src.experiments.score_usability`.
+
 ## Reproducibility
 
 Details are in [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md): environment, splits, seeds, checkpoint hashes and known nondeterminism.
@@ -232,6 +260,10 @@ python -m src.experiments.train_reward_variants  # D3 reward variants (18 polici
 python -m src.experiments.run_fp_reduction       # D3 false-positive study (needs val/test recordings)
 python -m src.experiments.run_robustness         # D3 robustness study (needs test recordings)
 bash scripts/reproduce_experiments.sh            # all of the above in order
+python -m src.experiments.run_motion_thresholds    # D4 motion-aware thresholds (needs val/test recordings)
+python -m src.experiments.run_participant_analysis # D4 participant-wise results
+python -m src.experiments.run_bootstrap            # D4 block-bootstrap intervals
+python -m src.experiments.run_failure_cases        # D4 failure cases (needs test recordings)
 ```
 
 - **Configuration tracking.** Each experiment reads a JSON config in `configs/experiments/` and writes a `manifest.json` with input hashes and package versions.
